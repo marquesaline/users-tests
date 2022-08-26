@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./src/bin/www",
+    "dev": "nodemon ./src/bin/www",
     "test": "jest"
   },
   "repository": {
@@ -13,9 +14,7 @@
   },
   "author": "Aline Marques",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/marquesaline/api-gestao-imagens/issues"
-  },
+
   "dependencies": {
     "@types/jest": "^28.1.8",
     "cookie-parser": "~1.4.4",
