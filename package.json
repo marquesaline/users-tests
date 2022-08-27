@@ -2,7 +2,7 @@
   "name": "api-gestao-imagens",
   "version": "1.0.0",
   "description": "API de gestão de imagens",
-  "main": "index.js",
+  "main": "./src/app.js",
   "scripts": {
     "start": "node ./src/bin/www",
     "dev": "nodemon ./src/bin/www",

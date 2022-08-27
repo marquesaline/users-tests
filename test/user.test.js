@@ -1,11 +1,18 @@
+
 const app = require('../src/app');
 const supertest = require('supertest');
 
 const req = supertest(app);
 
+function fail(reason = "fail was called in a test.") {
+    throw new Error(reason);
+  }
+  
+global.fail = fail;
+
 
 describe('Cadastro de usuário', () => {
-    it('Cadastrar um usuário com sucesso', () => {
+    it('Cadastrar um usuário com sucesso', async () => {
 
         // geração de emails diferentes p/ evitar erros por emails repetidos
         let time = Date.now();
@@ -15,11 +22,26 @@ describe('Cadastro de usuário', () => {
             email,
             password: '123456'
         };
-        return req.post('/user').send(user).then(res => {
-            
-                expect(res.statusCode).toEqual(200);
-                expect(res.body.email).toEqual(email);
+        try {
+            const res = await req.post('/users/user').send(user);
+            expect(res.statusCode).toEqual(200);
+            expect(res.body.email).toEqual(email);
+        } catch (error) {
+            throw error;
+        }
+    })
 
-            }).catch(error => fail(error));
+    it('Impedir o cadastro de usuário com os dados vazios', async() => {
+        let user = {
+            name: '', 
+            email: '',
+            password: ''
+        };
+        try {
+            const res = await req.post('/users/user').send(user);
+            expect(res.statusCode).toEqual(400); // 400 = Bad request
+        } catch (error) {
+            throw error;
+        }
     })
 })
