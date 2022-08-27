@@ -2,6 +2,7 @@ const controller = {};
 const { User } = require('../database/models');
 const { getUser } = require('../services/users');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 controller.registrationUser = async (req, res) => {
 
@@ -36,5 +37,14 @@ controller.registrationUser = async (req, res) => {
     
 }
 
+controller.deleteUser = async (req, res) => {
+    const user = await getUser(req.params.email);
+    const id = user.id;
+    await User.destroy({ 
+        where: { id }
+    })
+    res.sendStatus(200);
+
+}
 
 module.exports = controller;

@@ -3,6 +3,25 @@ const app = require('../src/app');
 const supertest = require('supertest');
 let req = supertest(app);
 
+let mainUser = { 
+    name: 'Maria da Silva',
+    email: 'maria@email.com',
+    password: '123456'
+};
+
+beforeAll(() => {
+    return req.post('/users/user')
+            .send(mainUser)
+            .then(res => {})
+            .catch(error => console.log(error))
+})
+
+afterAll(() => {
+    return req.delete(`/users/user-delete/${mainUser.email}`)
+        .then(res => {})
+        .catch(error => console.log(error))
+
+})
 
 describe('Cadastro de usuário', () => {
     it('Cadastrar um usuário com sucesso', async () => {

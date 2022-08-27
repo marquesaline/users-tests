@@ -8,5 +8,6 @@ router.get('/', function(_req, _res, next) {
 });
 
 router.post('/user', userController.registrationUser);
+router.delete('/user-delete/:email', userController.deleteUser);
 
 module.exports = router;
