@@ -1,13 +1,13 @@
 const controller = {};
 const { User } = require('../database/models');
 
-controller.registrationUser = async (req, res) => {
+controller.registrationUser = async (_req, _res) => {
 
-    const { user, email, password } = req.body;
+    const { user, email, password } = _req.body;
 
     //validação dos campos vazios
     if(user == '' || email == '' || password == '' ) {
-        res.sendStatus(400);
+        _res.sendStatus(400);
         return;
     }
 
