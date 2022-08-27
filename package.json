@@ -1,7 +1,7 @@
 {
-  "name": "api-gestao-imagens",
+  "name": "users-tests",
   "version": "1.0.0",
-  "description": "API de gestão de imagens",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node ./src/bin/www",
