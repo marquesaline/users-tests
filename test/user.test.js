@@ -1,15 +1,7 @@
 
 const app = require('../src/app');
 const supertest = require('supertest');
-
 const req = supertest(app);
-
-function fail(reason = "fail was called in a test.") {
-    throw new Error(reason);
-  }
-  
-global.fail = fail;
-
 
 describe('Cadastro de usuário', () => {
     it('Cadastrar um usuário com sucesso', async () => {
