@@ -1,17 +1,22 @@
 const controller = {};
 const { User } = require('../database/models');
 const { getUser } = require('../services/users');
+const bcrypt = require('bcrypt');
 
 controller.registrationUser = async (req, res) => {
 
-    const { user, email, password } = req.body;
+    const { name, email, password } = await req.body;
+
+    const passwordCript = bcrypt.hashSync(password, 3)
 
     //validação dos campos vazios
-    if(user == '' || email == '' || password == '' ) {
+    if(name == '' || email == '' || password == '' ) {
         res.sendStatus(400);
         return;
     }
     
+    
+
     try {
         //checa se o email já foi cadastrado
         let findUser = await getUser(email);
@@ -21,7 +26,7 @@ controller.registrationUser = async (req, res) => {
             return;
         }
 
-        await User.create({ user, email, password });
+        await User.create({ name, email, password: passwordCript });
         res.json({email});
 
     }catch(error) {
