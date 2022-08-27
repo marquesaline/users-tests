@@ -1,8 +1,9 @@
 {
   "name": "users-tests",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "1.0.0",sssssssssssssssssssssssssssssssssss
+  "description": "API de gestão de imagens",
+  "main": "./src/app.js",
+
   "scripts": {
     "start": "node ./src/bin/www",
     "dev": "nodemon ./src/bin/www",
@@ -14,9 +15,9 @@
   },
   "author": "Aline Marques",
   "license": "ISC",
-
   "dependencies": {
     "@types/jest": "^28.1.8",
+    "bcrypt": "^5.0.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "^4.18.1",
