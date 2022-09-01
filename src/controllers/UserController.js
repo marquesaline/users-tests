@@ -3,6 +3,7 @@ const { User } = require('../database/models');
 const { getUser } = require('../services/users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const jwtScret = 'masdasdasdaevfg';
 
 controller.registrationUser = async (req, res) => {
 
@@ -15,8 +16,6 @@ controller.registrationUser = async (req, res) => {
         res.sendStatus(400);
         return;
     }
-    
-    
 
     try {
         //checa se o email já foi cadastrado
@@ -44,6 +43,37 @@ controller.deleteUser = async (req, res) => {
         where: { id }
     })
     res.sendStatus(200);
+
+}
+
+controller.authentication = async (req, res) => {
+    const { email, password } = req.body;
+    const user = await getUser(email);
+
+    if(user == undefined) {
+        res.statusCode = 403;
+        res.json({errors: { email: 'Email não cadastrado'}});
+        return;
+    }
+
+    const isPasswordRight = await bcrypt.compare(password, user.password);
+
+    if(!isPasswordRight) {
+        res.statusCode = 403;
+        res.json({errors: {password: 'Senha incorreta'}});
+        return;
+    }
+
+
+    jwt.sign({email, name: user.name, id: user.id}, jwtScret, {espiresIn: '48h'}, (error, token) => {
+        if(error) {
+            res.sendStatus(500);
+            console.log(error);
+        } else {
+            res.statusCode = 200;
+            res.json({token});
+        }
+    });
 
 }
 

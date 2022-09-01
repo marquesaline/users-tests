@@ -92,3 +92,36 @@ describe('Cadastro de usuário', () => {
             });
     });
 })
+
+describe('Autenticação', () => {
+    it('Retornar um token quando logar', () => {
+        return req.post('/users/auth')
+                .send({email: mainUser.email, password: mainUser.password})
+                .then(res => {
+                    expect(res.statusCode).toEqual(200);
+                    expect(res.body.token).toBeDefined();
+                })
+                .catch(error => {throw error})
+
+    });
+    
+    it('Impedir que um usuário não cadastrado faça o login', () => {
+        return req.post('/users/auth')
+        .send({email: "emailqualquer@email.com", password: "5015451"})
+        .then(res => {
+            expect(res.statusCode).toEqual(403);
+            expect(res.body.errors.email).toEqual('Email não cadastrado');
+        })
+        .catch(error => {throw error})
+    });
+
+    it('Impedir que um usuário faça o login com uma senha errada', () => {
+        return req.post('/users/auth')
+        .send({email: mainUser.email, password: "5015451"})
+        .then(res => {
+            expect(res.statusCode).toEqual(403);
+            expect(res.body.errors.password).toEqual('Senha incorreta');
+        })
+        .catch(error => {throw error})
+    });
+})
