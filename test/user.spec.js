@@ -3,6 +3,25 @@ const app = require('../src/app');
 const supertest = require('supertest');
 let req = supertest(app);
 
+let mainUser = { 
+    name: 'Maria da Silva',
+    email: 'maria@email.com',
+    password: '123456'
+};
+
+beforeAll(() => {
+    return req.post('/users/user')
+            .send(mainUser)
+            .then(res => {})
+            .catch(error => console.log(error))
+})
+
+afterAll(() => {
+    return req.delete(`/users/user-delete/${mainUser.email}`)
+        .then(res => {})
+        .catch(error => console.log(error))
+
+})
 
 describe('Cadastro de usuário', () => {
     it('Cadastrar um usuário com sucesso', async () => {
@@ -71,5 +90,38 @@ describe('Cadastro de usuário', () => {
             }).catch (error => {
                throw error;
             });
+    });
+})
+
+describe('Autenticação', () => {
+    it('Retornar um token quando logar', () => {
+        return req.post('/users/auth')
+                .send({email: mainUser.email, password: mainUser.password})
+                .then(res => {
+                    expect(res.statusCode).toEqual(200);
+                    expect(res.body.token).toBeDefined();
+                })
+                .catch(error => {throw error})
+
+    });
+    
+    it('Impedir que um usuário não cadastrado faça o login', () => {
+        return req.post('/users/auth')
+        .send({email: "emailqualquer@email.com", password: "5015451"})
+        .then(res => {
+            expect(res.statusCode).toEqual(403);
+            expect(res.body.errors.email).toEqual('Email não cadastrado');
+        })
+        .catch(error => {throw error})
+    });
+
+    it('Impedir que um usuário faça o login com uma senha errada', () => {
+        return req.post('/users/auth')
+        .send({email: mainUser.email, password: "5015451"})
+        .then(res => {
+            expect(res.statusCode).toEqual(403);
+            expect(res.body.errors.password).toEqual('Senha incorreta');
+        })
+        .catch(error => {throw error})
     });
 })
