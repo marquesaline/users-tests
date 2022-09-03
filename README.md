@@ -1,6 +1,16 @@
 
 # users tests
+Testes de validação de usuários 
 
-<h4 align="center"> 
-	🚧  🚀 Em construção...  🚧
-</h4>
+
+### Tecnologias utilizadas:
+
+```bash
+- NodeJs
+- Express
+- EJS
+- Sequelize
+- MySQL
+- Mocha
+
+```
