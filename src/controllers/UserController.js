@@ -21,12 +21,14 @@ controller.registrationUser = async (req, res) => {
         //checa se o email já foi cadastrado
         let findUser = await getUser(email);
         if(findUser != undefined) {
-            res.statusCode = 400;
-            res.json({error: 'Email já cadastrado'});
+            res.sendStatus(400);
+            res.json({error: 'Email já cadastrado', email});
+            
             return;
         }
 
         await User.create({ name, email, password: passwordCript });
+        res.statusCode = 200;
         res.json({email});
 
     }catch(error) {
@@ -52,7 +54,7 @@ controller.authentication = async (req, res) => {
 
     if(user == undefined) {
         res.statusCode = 403;
-        res.json({errors: { email: 'Email não cadastrado'}});
+        res.json({errors: { email: 'Email não cadastrado'   }});
         return;
     }
 
@@ -60,12 +62,12 @@ controller.authentication = async (req, res) => {
 
     if(!isPasswordRight) {
         res.statusCode = 403;
-        res.json({errors: {password: 'Senha incorreta'}});
+        res.json({errors: { password: 'Senha incorreta' }});
         return;
     }
 
 
-    jwt.sign({email, name: user.name, id: user.id}, jwtScret, {espiresIn: '48h'}, (error, token) => {
+    jwt.sign({email, name: user.name, id: user.id}, jwtScret, (error, token) => {
         if(error) {
             res.sendStatus(500);
             console.log(error);

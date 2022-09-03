@@ -1,127 +1,132 @@
 
+const { expect } = require('chai').expect;
+const { throws } = require('assert');
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const { error } = require('console');
+
 const app = require('../../src/app');
-const supertest = require('supertest');
-let req = supertest(app);
+const {
+    userExemple,
+    goodRequest,
+    badRequestEmpty,
+    userUnregistered
+} = require('../mocks/mockUser');
 
-let mainUser = { 
-    name: 'Maria da Silva',
-    email: 'maria@email.com',
-    password: '123456'
-};
 
-beforeAll(() => {
-    return req.post('/users/user')
-            .send(mainUser)
-            .then(res => {})
-            .catch(error => console.log(error))
-})
 
-afterAll(() => {
-    return req.delete(`/users/user-delete/${mainUser.email}`)
-        .then(res => {})
-        .catch(error => console.log(error))
 
-})
+chai.use(chaiHttp);
+chai.should();
 
+before(() => {
+    chai
+        .request(app)
+        .post('/users/user')
+        .send(userExemple)
+        .end(res => {})
+});
+
+after(() => {
+    chai 
+        .request(app)
+        .delete(`/users/user-delete/${userExemple.email}`)
+        .end(res => {})
+
+});
 describe('Cadastro de usuário', () => {
-    it('Cadastrar um usuário com sucesso', async () => {
-
-        // geração de emails diferentes p/ evitar erros por emails repetidos
-        let time = Date.now();
-        let email = `${time}@email.com`;
-        let user = {
-            name: 'Aline', 
-            email,
-            password: '123456'
-        };
-
-        return req.post('/users/user')
-            .send(user)
-            .then(res => {
-                expect(res.statusCode).toEqual(200);
-                expect(res.body.email).toEqual(email);
-            }).catch (error => {
-                throw error;
+    it('Cadastrar um usuário com sucesso', (done) => {
+        chai
+            .request(app)
+            .post('/users/user')
+            .send(goodRequest)
+            .end((err, res) => {
+                res.status.should.equal(200);
+                res.body.should.have.property('email').equal(goodRequest.email);
+                done();
             });
+
+            
     });
 
-    it('Impedir o cadastro de usuário com os dados vazios', async() => {
-        let user = {
-            name: '', 
-            email: '',
-            password: ''
-        };
-        return await req.post('/users/user')
-            .send(user)
-            .then(res => {
-                expect(res.statusCode).toEqual(400); // 400 = Bad request
-            }).catch (error => {
-                throw error;
+    it('Impedir o cadastro de usuário com os dados vazios', (done) => {
+        
+        chai
+            .request(app)
+            .post('/users/user')
+            .send(badRequestEmpty)
+            .end((err, res) => {
+                res.status.should.equal(400);
+                done();
             });
+
     });
 
-    it('Impedir o cadastro de usuário com email repetido', async () => {
-
-       // geração de emails diferentes p/ evitar erros por emails repetidos
-       let time = Date.now();
-       let email = `${time}@email.com`;
-       let user = {
-           name: 'Aline', 
-           email,
-           password: '123456'
-       };
-
-       return await req.post('/users/user')
-           .send(user)
-           .then(res => {
-               expect(res.statusCode).toEqual(200);
-               expect(res.body.email).toEqual(email);
-
-               req.post('/users/user')
-               .send(user)
-               .then(res => {
-
-                    expect(res.statusCode).toEqual(400);
-                    expect(res.body.error).toEqual('Email já cadastrado');
-
-               }).catch(error => {
-                throw(error);
-               })
-            }).catch (error => {
-               throw error;
-            });
-    });
-})
+    // it('Impedir o cadastro de usuário com email repetido', (done) => {
+    //     // chai
+    //     //    .request(app)
+    //     //    .post('/users/user')
+    //     //    .send(mocks.goodRequest)
+    //     //    .end((err, res) => {
+    //     //        res.status.should.equal(200);
+    //     //        res.body.should.have.property('email').equal(mocks.goodRequest.email);
+    //     //        done();
+             
+    //     //    });
+    //     chai
+    //         .request(app)
+    //         .post('/users/user')
+    //         .send(mainUser)
+    //         .end((err, res) => {
+    //             res.status.should.equal(400);
+    //             res.body.shoud.have.error().equal('Email já cadastrado')
+    //             done();
+    //         });
+            
+    // });
+});
 
 describe('Autenticação', () => {
-    it('Retornar um token quando logar', () => {
-        return req.post('/users/auth')
-                .send({email: mainUser.email, password: mainUser.password})
-                .then(res => {
-                    expect(res.statusCode).toEqual(200);
-                    expect(res.body.token).toBeDefined();
-                })
-                .catch(error => {throw error})
+    it('Retornar um token quando logar', (done) => {
+        chai
+            .request(app)
+            .post('/users/auth')
+            .send(userExemple)
+            .end((err, res) => {
+                res.status.should.equal(200);
+                res.body.token.should.not.be.undefined;
+                done();
 
+            })
     });
     
-    it('Impedir que um usuário não cadastrado faça o login', () => {
-        return req.post('/users/auth')
-        .send({email: "emailqualquer@email.com", password: "5015451"})
-        .then(res => {
-            expect(res.statusCode).toEqual(403);
-            expect(res.body.errors.email).toEqual('Email não cadastrado');
-        })
-        .catch(error => {throw error})
+    it('Impedir que um usuário não cadastrado faça o login', (done) => {
+
+        chai 
+            .request(app)
+            .post('/users/auth')
+            .send(userUnregistered)
+            .end((err, res) => {
+                res.status.should.equal(403);
+                res.body.errors.email.should.equal('Email não cadastrado');
+                done();
+            })
     });
 
-    it('Impedir que um usuário faça o login com uma senha errada', () => {
-        return req.post('/users/auth')
-        .send({email: mainUser.email, password: "5015451"})
-        .then(res => {
-            expect(res.statusCode).toEqual(403);
-            expect(res.body.errors.password).toEqual('Senha incorreta');
-        })
-        .catch(error => {throw error})
+    it('Impedir que um usuário faça o login com uma senha errada', (done) => {
+        chai 
+            .request(app)
+            .post('/users/auth')
+            .send({name: userExemple.name, email: userExemple.email, password: '51514141'})
+            .end((err, res) => {
+                res.status.should.equal(403);
+                res.body.errors.password.should.equal('Senha incorreta');
+                done();
+            })
     });
-})
+});
+
+
+
+
+
