@@ -1,17 +1,19 @@
+const chai = require('chai');
+const chaiHttp = require('chai-http');
 const app = require('../../src/app');
-const supertest = require('supertest');
-const request = supertest(app);
+
+chai.use(chaiHttp);
+chai.should();
 
 //teste de validação da porta e de conexão
-it('A aplicação deve responser na porta 3000', async () => {
+it('A aplicação deve responser na porta 3000', (done) => {
 
-    return request.get('/').then(res => { 
-
-       const status = res.statusCode;
-       expect(status).toEqual(200);
-       
-    }).catch(error => { 
-        throw error 
-    });
+    chai
+        .request(app)
+        .get('/')
+        .end((err, res) => {
+            res.status.should.equal(200);
+            done();
+        })
     
 })

@@ -1,9 +1,5 @@
-
-const { expect } = require('chai').expect;
-const { throws } = require('assert');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const { error } = require('console');
 
 const app = require('../../src/app');
 const {
@@ -12,9 +8,6 @@ const {
     badRequestEmpty,
     userUnregistered
 } = require('../mocks/mockUser');
-
-
-
 
 chai.use(chaiHttp);
 chai.should();
